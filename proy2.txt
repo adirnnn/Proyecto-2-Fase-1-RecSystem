@@ -1,0 +1,50 @@
+# Importar librerías necesarias
+import neo4j
+- aqui iria la info (link de neo4j, password, etc)
+
+# Importar librerías necesarias
+import neo4j
+import spotipy
+from spotipy.oauth2 import SpotifyClientCredentials
+
+# Función para obtener recomendaciones de canciones similares
+def obtener_canciones_similares(cancion):
+    # Aquí se realizaría la búsqueda de canciones similares usando la API de Spotify
+    # o leyendo un archivo CSV con datos predefinidos
+    # Por simplicidad, lo demuestro de manera predefinida
+    canciones_similares = ["Canción 1", "Canción 2", "Canción 3"]
+    return canciones_similares
+
+# Función principal
+def main():
+    # Pedir al usuario que ingrese las canciones que ha escuchado recientemente
+    canciones_escuchadas = input("Ingresa las canciones que has escuchado recientemente (separadas por coma): ").split(",")
+
+    # Obtener canciones similares para cada canción escuchada
+    canciones_recomendadas = []
+    for cancion in canciones_escuchadas:
+        canciones_similares = obtener_canciones_similares(cancion)
+        canciones_recomendadas.extend(canciones_similares)
+
+    # Conectar con la base de datos de Neo4j
+    conexion_neo4j = neo4j.connect()
+
+    # Crear nodos para las canciones escuchadas por el usuario
+    for cancion in canciones_escuchadas:
+        conexion_neo4j.crear_nodo("Cancion", nombre=cancion, escuchada_por="Usuario")
+
+    # Crear nodos para las canciones recomendadas
+    for cancion in canciones_recomendadas:
+        conexion_neo4j.crear_nodo("Cancion", nombre=cancion, recomendada_a="Usuario")
+
+    # Crear relaciones entre las canciones escuchadas y las recomendadas
+    for cancion_escuchada in canciones_escuchadas:
+        for cancion_recomendada in canciones_recomendadas:
+            conexion_neo4j.crear_relacion(cancion_escuchada, "ES_SIMILAR_A", cancion_recomendada)
+
+    # Mostrar la conexión entre las canciones escuchadas y las recomendadas en Neo4j
+    conexion_neo4j.mostrar_grafico()
+
+# Ejecutar la función principal
+if __name__ == "__main__":
+    main()
